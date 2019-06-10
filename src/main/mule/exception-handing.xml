@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="081692c9-9270-4457-ad5b-75b36d0b5641" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="51632f22-4647-484e-9969-aece7e426216" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="employee" />
+	</db:config>
+	<flow name="exception-handingFlow" doc:id="334f5375-e588-45d0-b34f-7fbcdd10de51" >
+		<http:listener doc:name="Listener" doc:id="8a18b437-3a0e-414e-b0b8-97fb2296c072" config-ref="HTTP_Listener_config" path="/invoke"/>
+		<java:invoke-static method="staticFunctionTest(int,int)" doc:name="Invoke static" doc:id="36f5f653-4935-4163-a5d8-07a39dd866ec" class="error.hello">
+			<java:args ><![CDATA[#[{
+	arg0:1,
+	arg1:2
+}]]]></java:args>
+		</java:invoke-static>
+		<logger level="INFO" doc:name="Logger" doc:id="ed3a5a33-0a22-4d32-90d9-75602fd3603e" message="#[payload]"/>
+		<java:new constructor="hello()" doc:name="New" doc:id="a63ad320-bd33-4306-83d4-5d9809a144af" class="error.hello" target="inst"/>
+		<java:invoke method="ConcatAB(java.lang.String,java.lang.String)" doc:name="Invoke" doc:id="08929ca1-6332-4c35-b4d9-d51692b8e5fa" class="error.hello" instance="#[vars.inst]">
+			<java:args ><![CDATA[#[{
+	arg0:"mouli",
+	arg1:"kohli"
+}]]]></java:args>
+		</java:invoke>
+		
+		<logger level="INFO" doc:name="Logger" doc:id="72c20da4-cc6d-42fe-964b-5dd4596c9e27" message="==============#[vars.inst]"/>
+	</flow>
+</mule>
